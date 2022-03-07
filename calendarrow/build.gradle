@@ -55,7 +55,7 @@ afterEvaluate {
 
                 groupId = 'com.github.MamboBryan'
                 artifactId = 'calendar-row'
-                version = '0.0.1'
+                version = '0.0.2-beta'
             }
         }
     }

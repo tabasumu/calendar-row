@@ -7,10 +7,9 @@ import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.mambobryan.calendarrow.databinding.ItemDateBinding
+import com.mambobryan.library.calendarrow.databinding.ItemDateBinding
 import com.mambobryan.calendarrow.utils.DateUtils
 import java.util.*
-
 
 class CalendarViewAdapter :
     ListAdapter<Date, CalendarViewAdapter.CalendarViewHolder>(DATE_COMPARATOR) {

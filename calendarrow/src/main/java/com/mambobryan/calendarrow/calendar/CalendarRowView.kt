@@ -7,7 +7,7 @@ import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.mambobryan.calendarrow.R
+import com.mambobryan.library.calendarrow.R
 import com.mambobryan.calendarrow.selection.CalendarDetailsLookup
 import com.mambobryan.calendarrow.selection.CalendarKeyProvider
 import com.mambobryan.calendarrow.selection.CalendarSelectionManager
