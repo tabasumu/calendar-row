@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CalendarRowView">
+        <attr name="pastDaysCount" format="integer" />
+        <attr name="futureDaysCount" format="integer" />
+        <attr name="includeCurrentDate" format="boolean" />
+        <attr name="initialPositionIndex" format="integer" />
+        <attr name="multiSelection" format="boolean" />
+        <attr name="deselection" format="boolean" />
+        <attr name="longPress" format="boolean" />
+        <attr name="unselectedTextColor" format="integer" />
+        <attr name="selectedTextColor" format="integer" />
+        <attr name="unselectedBackgroundColor" format="integer" />
+        <attr name="selectedBackgroundColor" format="integer" />
+    </declare-styleable>
+</resources>
