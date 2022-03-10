@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.3515625" />
+        <entry key="calendarrow/src/main/res/drawable/background_color_state.xml" value="0.3525" />
         <entry key="calendarrow/src/main/res/layout/item_date.xml" value="0.3515625" />
       </map>
     </option>
