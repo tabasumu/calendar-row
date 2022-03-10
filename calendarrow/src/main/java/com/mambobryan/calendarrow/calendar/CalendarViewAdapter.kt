@@ -1,5 +1,6 @@
 package com.mambobryan.calendarrow.calendar
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.selection.ItemDetailsLookup
@@ -11,7 +12,12 @@ import com.mambobryan.library.calendarrow.databinding.ItemDateBinding
 import com.mambobryan.calendarrow.utils.DateUtils
 import java.util.*
 
-class CalendarViewAdapter :
+class CalendarViewAdapter(
+    val textColor: Int,
+    val selectedTextColor: Int,
+    val backgroundColor: Int,
+    val selectedBackgroundColor: Int
+) :
     ListAdapter<Date, CalendarViewAdapter.CalendarViewHolder>(DATE_COMPARATOR) {
 
     companion object {
@@ -50,21 +56,25 @@ class CalendarViewAdapter :
         fun bind(date: Date, selected: Boolean) {
             binding.apply {
 
+                val color = if (selected) textColor else selectedTextColor
+
                 tvCalendarDay.apply {
                     text = DateUtils.getDay3LettersName(date)
                     isSelected = selected
+                    setTextColor(color)
                 }
 
                 tvCalendarDate.apply {
                     text = DateUtils.getDayNumber(date)
                     isSelected = selected
+                    setTextColor(color)
                 }
 
                 layoutCalendar.apply {
                     isSelected = selected
+                    setBackgroundColor(if (selected) selectedBackgroundColor else backgroundColor)
                 }
 
-//                layoutCalendar.setBackgroundColor(Color.TRANSPARENT)
             }
         }
 

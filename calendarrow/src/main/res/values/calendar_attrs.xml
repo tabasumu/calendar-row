@@ -8,9 +8,11 @@
         <attr name="multiSelection" format="boolean" />
         <attr name="deselection" format="boolean" />
         <attr name="longPress" format="boolean" />
-        <attr name="unselectedTextColor" format="integer" />
-        <attr name="selectedTextColor" format="integer" />
-        <attr name="unselectedBackgroundColor" format="integer" />
-        <attr name="selectedBackgroundColor" format="integer" />
+
+        <attr name="unselectedTextColor" format="color" />
+        <attr name="selectedTextColor" format="color" />
+
+        <attr name="unselectedBackgroundColor" format="color" />
+        <attr name="selectedBackgroundColor" format="color" />
     </declare-styleable>
 </resources>

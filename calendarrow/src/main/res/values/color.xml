@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--    DEFAULT TEXT COLOR -->
     <color name="textColor">#000000</color>
-    <color name="selectedTextColor">#FFFFFF</color>
-    <color name="backgroundColor">#FFFFFF</color>
+    <color name="selectedTextColor">#ffffff</color>
+
+    <!--    DEFAULT BACKGROUND COLOR -->
+    <color name="backgroundColor">@android:color/transparent</color>
     <color name="selectedBackgroundColor">#0842EE</color>
 </resources>

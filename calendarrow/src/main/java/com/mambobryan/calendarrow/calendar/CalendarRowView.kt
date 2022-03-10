@@ -3,6 +3,7 @@ package com.mambobryan.calendarrow.calendar
 import android.content.Context
 import android.os.Bundle
 import android.util.AttributeSet
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,9 +48,6 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
     }
 
     var calendarChangesObserver = object : CalendarViewChangeObserver {
-        override fun whenSelectionChanged(isSelected: Boolean, position: Int, date: Date) {
-            super.whenSelectionChanged(isSelected, position, date)
-        }
     }
 
     var calendarSelectionManager = object : CalendarSelectionManager {
@@ -87,25 +85,43 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
 
                 // SELECTION
                 multiSelection = getBoolean(R.styleable.CalendarRowView_multiSelection, false)
-                deselection = getBoolean(R.styleable.CalendarRowView_deselection, true)
+                deselection = getBoolean(R.styleable.CalendarRowView_deselection, false)
                 longPress = getBoolean(R.styleable.CalendarRowView_longPress, false)
 
                 // TEXT COLOR
                 unselectedTextColor =
-                    getInt(R.styleable.CalendarRowView_unselectedTextColor, R.color.textColor)
+                    getColor(
+                        R.styleable.CalendarRowView_unselectedTextColor,
+                        ContextCompat.getColor(
+                            this@CalendarRowView.context,
+                            R.color.textColor
+                        )
+                    )
                 selectedTextColor =
-                    getInt(R.styleable.CalendarRowView_selectedTextColor, R.color.selectedTextColor)
+                    getColor(
+                        R.styleable.CalendarRowView_selectedTextColor,
+                        ContextCompat.getColor(
+                            this@CalendarRowView.context,
+                            R.color.selectedTextColor
+                        )
+                    )
 
                 // BACKGROUND COLOR
                 unselectedBackgroundColor =
-                    getInt(
+                    getColor(
                         R.styleable.CalendarRowView_unselectedBackgroundColor,
-                        R.color.backgroundColor
+                        ContextCompat.getColor(
+                            this@CalendarRowView.context,
+                            R.color.backgroundColor
+                        )
                     )
                 selectedBackgroundColor =
-                    getInt(
+                    getColor(
                         R.styleable.CalendarRowView_selectedBackgroundColor,
-                        R.color.selectedBackgroundColor
+                        ContextCompat.getColor(
+                            this@CalendarRowView.context,
+                            R.color.selectedBackgroundColor
+                        )
                     )
             } finally {
                 recycle()
@@ -142,7 +158,12 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
 
             setHasFixedSize(true)
 
-            adapter = CalendarViewAdapter()
+            adapter = CalendarViewAdapter(
+                selectedTextColor,
+                unselectedTextColor,
+                unselectedBackgroundColor,
+                selectedBackgroundColor
+            )
             (adapter as CalendarViewAdapter).submitList(dateList)
 
             initSelection()
@@ -262,7 +283,7 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
 
         selectionTracker.addObserver(selectionObserver)
 
-        select(0)
+        select(0 + pastDaysCount)
 
     }
 
@@ -361,7 +382,13 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
 
         dateList.clear()
         dateList.addAll(newDateList)
-        adapter = CalendarViewAdapter()
+        adapter = CalendarViewAdapter(
+            selectedTextColor,
+            unselectedTextColor,
+            unselectedBackgroundColor,
+            selectedBackgroundColor
+        )
+
         (adapter as CalendarViewAdapter).submitList(dateList)
 
         if (scrollPosition > dateList.size - 1)
