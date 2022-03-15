@@ -1,47 +1,35 @@
 package com.mambobryan.calendarrow.calendar
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.selection.SelectionTracker
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mambobryan.library.calendarrow.databinding.ItemDateBinding
 import com.mambobryan.calendarrow.utils.DateUtils
 import java.util.*
 
-class CalendarViewAdapter(
-    val textColor: Int,
-    val selectedTextColor: Int,
-    val backgroundColor: Int,
-    val selectedBackgroundColor: Int
-) :
-    ListAdapter<Date, CalendarViewAdapter.CalendarViewHolder>(DATE_COMPARATOR) {
+class CalendarViewAdapter :
+    RecyclerView.Adapter<CalendarViewAdapter.CalendarViewHolder>() {
+
+    var textColor: Int? = null
+    var selectedTextColor: Int? = null
+    var backgroundColor: Int? = null
+    var selectedBackgroundColor: Int? = null
+
+    private var dates = listOf<Date>()
 
     companion object {
         lateinit var selectionTracker: SelectionTracker<Long>
-        private val DATE_COMPARATOR =
-            object : DiffUtil.ItemCallback<Date>() {
-                override fun areItemsTheSame(
-                    oldItem: Date,
-                    newItem: Date
-                ): Boolean {
-                    return oldItem.time == newItem.time
-                }
-
-                override fun areContentsTheSame(
-                    oldItem: Date,
-                    newItem: Date
-                ): Boolean {
-                    return oldItem == newItem
-                }
-            }
     }
 
     init {
         setHasStableIds(true)
+    }
+
+    fun setList(list: List<Date>) {
+        dates = list
+        notifyDataSetChanged()
     }
 
     inner class CalendarViewHolder(private val binding: ItemDateBinding) :
@@ -56,26 +44,32 @@ class CalendarViewAdapter(
         fun bind(date: Date, selected: Boolean) {
             binding.apply {
 
-                val color = if (selected) textColor else selectedTextColor
+                val color = if (selected) selectedTextColor else textColor
 
                 tvCalendarDay.apply {
                     text = DateUtils.getDay3LettersName(date)
                     isSelected = selected
-                    setTextColor(color)
+                    color?.let { setTextColor(it) }
                 }
 
                 tvCalendarDate.apply {
                     text = DateUtils.getDayNumber(date)
                     isSelected = selected
-                    setTextColor(color)
+                    color?.let { setTextColor(it) }
                 }
 
                 layoutCalendar.apply {
                     isSelected = selected
-                    setBackgroundColor(if (selected) selectedBackgroundColor else backgroundColor)
+                    (if (selected) selectedBackgroundColor else backgroundColor)?.let {
+                        setBackgroundColor(
+                            it
+                        )
+                    }
                 }
 
             }
+
+
         }
 
         fun getItemDetails(): ItemDetailsLookup.ItemDetails<Long> =
@@ -84,19 +78,6 @@ class CalendarViewAdapter(
                 override fun getSelectionKey(): Long? = itemId
             }
 
-    }
-
-
-    override fun getItemViewType(position: Int): Int {
-        return when (selectionTracker.isSelected(position.toLong())) {
-            true -> {
-                val selectedPosition = position + 1
-                -selectedPosition
-            }
-            false -> {
-                position
-            }
-        }
     }
 
 
@@ -111,12 +92,12 @@ class CalendarViewAdapter(
 
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
 
-        val date = getItem(position)
+        val date = dates[position]
         holder.bind(date, selectionTracker.isSelected(position.toLong()))
 
     }
 
-    override fun getItemCount() = currentList.size
+    override fun getItemCount() = dates.size
 
     override fun getItemId(position: Int): Long = position.toLong()
 }

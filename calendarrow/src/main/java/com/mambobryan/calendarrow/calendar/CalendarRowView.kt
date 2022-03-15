@@ -14,6 +14,7 @@ import com.mambobryan.calendarrow.selection.CalendarKeyProvider
 import com.mambobryan.calendarrow.selection.CalendarSelectionManager
 import com.mambobryan.calendarrow.utils.DateUtils
 import java.util.*
+import kotlin.NoSuchElementException
 
 
 class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(context, attrs) {
@@ -42,6 +43,12 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
     var unselectedBackgroundColor: Int
     var selectedBackgroundColor: Int
 
+    val mAdapter: CalendarViewAdapter by lazy {
+        adapter = CalendarViewAdapter()
+        adapter as CalendarViewAdapter
+    }
+
+
     var dateChangeListener = object : OnDateChangeListener {
         override fun onDateChanged(isSelected: Boolean, date: Date) {
         }
@@ -65,7 +72,42 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
         }
     }
 
+    val selectionObserver = object : SelectionTracker.SelectionObserver<Long>() {
+        override fun onItemStateChanged(key: Long, selected: Boolean) {
+
+            if (key.toInt() != GHOST_ITEM_KEY && key.toInt() < dateList.size) {
+
+                val date = dateList[key.toInt()]
+
+                dateChangeListener.onDateChanged(selected, date)
+
+                calendarChangesObserver.whenSelectionChanged(selected, key.toInt(), date)
+            }
+
+            if (selectionTracker.selection.size() == 0)
+                disableLongPress()
+
+            super.onItemStateChanged(key, selected)
+
+        }
+
+        override fun onSelectionRefresh() {
+            calendarChangesObserver.whenSelectionRefreshed()
+            super.onSelectionRefresh()
+        }
+
+        override fun onSelectionRestored() {
+            calendarChangesObserver.whenSelectionRestored()
+            super.onSelectionRestored()
+        }
+
+    }
+
     init {
+
+
+        //  mAdapter = CalendarViewAdapter()
+
         // this remove blinking when clicking items
         itemAnimator = null
 
@@ -133,6 +175,11 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
 
         this.apply {
 
+            mAdapter.textColor = unselectedTextColor
+            mAdapter.selectedTextColor = selectedTextColor
+            mAdapter.backgroundColor = unselectedBackgroundColor
+            mAdapter.selectedBackgroundColor = selectedBackgroundColor
+
             // if user haven't specified list of custom dates, we can fetch them using DateUtils.getDates function
             if (dateList.isNullOrEmpty()) {
                 dateList.apply {
@@ -158,13 +205,7 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
 
             setHasFixedSize(true)
 
-            adapter = CalendarViewAdapter(
-                selectedTextColor,
-                unselectedTextColor,
-                unselectedBackgroundColor,
-                selectedBackgroundColor
-            )
-            (adapter as CalendarViewAdapter).submitList(dateList)
+            mAdapter.setList(dateList)
 
             initSelection()
 
@@ -283,7 +324,7 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
 
         selectionTracker.addObserver(selectionObserver)
 
-        select(0 + pastDaysCount)
+        select(pastDaysCount)
 
     }
 
@@ -307,6 +348,21 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
      * @return true if the item was selected. False if the item could not be selected, or was was already selected.
      */
     fun select(position: Int) = selectionTracker.select(position.toLong())
+
+    fun select(date: Date) {
+
+        if (getDates().isEmpty())
+            throw EmptyStackException()
+
+        if (!getDates().contains(date)) {
+            throw NoSuchElementException()
+        }
+
+        val position = getDates().indexOf(date)
+
+        selectionTracker.select(position.toLong())
+
+    }
 
     /**
      * Sets the selected state of the specified items if permitted after consulting SelectionPredicate
@@ -377,19 +433,11 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
      * @param newDateList - new dates, which we want to use in calendar
      */
     fun setDates(newDateList: List<Date>) {
-        if (::selectionTracker.isInitialized)
-            clearSelection()
 
         dateList.clear()
         dateList.addAll(newDateList)
-        adapter = CalendarViewAdapter(
-            selectedTextColor,
-            unselectedTextColor,
-            unselectedBackgroundColor,
-            selectedBackgroundColor
-        )
 
-        (adapter as CalendarViewAdapter).submitList(dateList)
+        mAdapter.setList(dateList)
 
         if (scrollPosition > dateList.size - 1)
             scrollPosition = dateList.size - 1
@@ -402,6 +450,19 @@ class CalendarRowView(context: Context, attrs: AttributeSet) : RecyclerView(cont
             DateUtils.getYear(dateList[scrollPosition]),
             dateList[scrollPosition]
         )
+    }
+
+    fun setDate(date: Date) {
+
+        dateList.apply {
+            clear()
+            addAll(DateUtils.getDates(pastDaysCount, futureDaysCount, date))
+        }
+
+        mAdapter.setList(dateList)
+
+        select(date)
+
     }
 
     /**

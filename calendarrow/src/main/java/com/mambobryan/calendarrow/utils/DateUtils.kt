@@ -85,6 +85,19 @@ object DateUtils {
         return futureDateList
     }
 
+    fun getFutureDates(count: Int, date: Date): MutableList<Date> {
+        val futureDateList = mutableListOf<Date>()
+
+        val cal = Calendar.getInstance(Locale.getDefault())
+        cal.time = date
+
+        for (i in 0 until count) {
+            cal.add(Calendar.DATE, 1)
+            futureDateList.add(cal.time)
+        }
+        return futureDateList
+    }
+
     /**
      * @param count - past days count from now which we want to load
      * @return list of past dates with specified length
@@ -92,6 +105,19 @@ object DateUtils {
     fun getPastDates(count: Int): MutableList<Date> {
         val pastDateList = mutableListOf<Date>()
         val cal = Calendar.getInstance(Locale.getDefault())
+        for (i in 0 until count) {
+            cal.add(Calendar.DATE, -1)
+            pastDateList.add(cal.time)
+        }
+        return pastDateList
+    }
+
+    fun getPastDates(count: Int, date: Date): MutableList<Date> {
+        val pastDateList = mutableListOf<Date>()
+
+        val cal = Calendar.getInstance(Locale.getDefault())
+        cal.time = date
+
         for (i in 0 until count) {
             cal.add(Calendar.DATE, -1)
             pastDateList.add(cal.time)
@@ -107,15 +133,21 @@ object DateUtils {
      * @return list of dates
      */
     fun getDates(pastDays: Int, futureDays: Int, includeCurrentDate: Boolean): List<Date> {
-        val futureList =
-            getFutureDates(
-                futureDays
-            )
-        val cal = Calendar.getInstance(Locale.getDefault())
-        val pastList = getPastDates(
-            pastDays
-        ).reversed()
-        return if (includeCurrentDate) pastList + cal.time + futureList else pastList + futureList
+        val today = Calendar.getInstance(Locale.getDefault())
+
+        val futureList = getFutureDates(futureDays)
+        val pastList = getPastDates(pastDays).reversed()
+
+        return if (includeCurrentDate) pastList + today.time + futureList else pastList + futureList
+    }
+
+    fun getDates(past: Int, future: Int, date: Date): List<Date> {
+        val today = Calendar.getInstance(Locale.getDefault())
+
+        val futureList = getFutureDates(future, date)
+        val pastList = getPastDates(past, date).reversed()
+
+        return pastList + date + futureList
     }
 
 }
